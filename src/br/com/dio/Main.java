@@ -2,6 +2,7 @@ package br.com.dio;
 
 import br.com.dio.model.Board;
 import br.com.dio.model.Space;
+import br.com.dio.util.SudokuGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,18 +63,21 @@ public class Main {
             return;
         }
 
+        SudokuGenerator generator = new SudokuGenerator();
+        generator.generateFullBoard();
+        int[][] fullBoard = generator.getBoard();
+        generator.removeNumbers(30);
+        int[][] gameBoard = generator.getBoard();
+
         List<List<Space>> spaces = new ArrayList<>();
         for (int i = 0; i < BOARD_LIMIT; i++) {
             spaces.add(new ArrayList<>());
             for (int j = 0; j < BOARD_LIMIT; j++) {
-                var positionConfig = positions.get("%s,%s".formatted(i, j));
-                var expected = Integer.parseInt(positionConfig.split(",")[0]);
-                var fixed = Boolean.parseBoolean(positionConfig.split(",")[1]);
-                var currentSpace = new Space(expected, fixed);
+                boolean fixed = (gameBoard[i][j] == 0) ? false : true;
+                var currentSpace = new Space(fullBoard[i][j], fixed);
                 spaces.get(i).add(currentSpace);
-            }
+            };
         }
-
         board = new Board(spaces);
         System.out.println("O jogo está pronto para começar");
     }
@@ -98,13 +102,13 @@ public class Main {
 
     private static void removeNumber() {
         if (isNull(board)){
-            System.out.println("O jogo ainda não foi iniciado iniciado");
+            System.out.println("O jogo ainda não foi iniciado");
             return;
         }
 
-        System.out.println("Informe a coluna que em que o número será inserido");
+        System.out.println("Informe a coluna que em que o número será retirado");
         var col = runUntilGetValidNumber(0, 8);
-        System.out.println("Informe a linha que em que o número será inserido");
+        System.out.println("Informe a linha que em que o número será retirado");
         var row = runUntilGetValidNumber(0, 8);
         if (!board.clearValue(col, row)){
             System.out.printf("A posição [%s,%s] tem um valor fixo\n", col, row);
